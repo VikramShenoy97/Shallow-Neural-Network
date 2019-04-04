@@ -1,7 +1,34 @@
 import numpy as np
 
 class NeuralNetwork():
+    """
+        Shallow Neural Network (Single Hidden Layer)
 
+        Parameters
+        ----------
+        n_h : int, Optional (default = 4)
+        Number of nodes in hidden layer.
+
+        number_of_iterations : int, Optional (default = 10000)
+        Number of iterations for training.
+
+        learning_rate : int, Optional (default  = 1.2)
+        Rate at which the algorithm learns.
+
+        verbose : boolean, Optional (default=False)
+        Controls verbosity of output:
+        - False: No Output
+        - True: Displays the cost at every 1000th iteration.
+
+        Attributes
+        ----------
+        costs_ : array, shape=[number_of_iterations/10]
+        Returns an array with the costs.
+
+        parameters_ : dictionary, {"W1":W1, "b1":b1, "W2":W2, "b2":b2}
+        Returns the weights and bias.
+
+    """
     def __init__(self, n_h=4, learning_rate=1.2, num_iterations=10000, verbose=False):
         self.n_h = n_h
         self.learning_rate = learning_rate
@@ -9,34 +36,101 @@ class NeuralNetwork():
         self.verbose = verbose
 
     def fit(self, X, Y):
+        """
+        Fits the neural network on to the data and labels.
+
+        Parameters
+        ----------
+        X : array-like, shape = [n_samples, n_features]
+            The training input samples.
+        Y : array-like, shape = [n_samples]
+            The target values.
+
+		Returns
+        -------
+        self : object
+
+        """
         return self._fit(X, Y)
 
     def predict(self, X):
+        """
+        Predicts the outcome of the given (data, label) pair.
+
+        Parameters
+        ----------
+        X : array-like, shape = [n_samples, n_features]
+            The training input samples.
+
+		Returns
+        -------
+        predictions: array, shape = [n_samples]
+            Prediction of the test data.
+        """
         return self._predictions(X)
 
     def evaluate_loss(self):
+        """
+        Stores the cost at every 1000th iteration.
+
+        Parameters
+        ----------
+        self : object
+
+		Returns
+        -------
+        costs: array, shape=[number_of_iterations/10]
+        Returns an array with the costs.
+        """
         return self._evaluate_loss()
 
     def accuracy(self, predictions, Y):
+        """
+        The Accuracy of the predicted label and the actual label.
+
+        Parameters
+        ----------
+        predictions : array-like, shape = [n_samples]
+            The predicted values.
+        Y : array-like, shape = [n_samples]
+            The target values.
+
+		Returns
+        -------
+        Accuracy: float
+        Accuracy of the predicted values.
+        """
         return self._accuracy(predictions, Y)
 
     def _sigmoid(self, z):
+        """
+        Perform the sigmoid activation function.
+        """
         s = 1. / (1 + np.exp(-z))
         return s
 
     def _layer_sizes(self, X, Y):
+        """
+        Define Layer sizes. (Input Layer, Hidden Layer, Output Layer)
+        """
         n_x = X.shape[0]
         n_h = 4
         n_y = Y.shape[0]
         return (n_x, n_h, n_y)
 
     def _initialize_parameters(self, n_x, n_y):
+        """
+        Initialize the weights and the bias.
+        - Weights are randomly initialized.
+        - Bias are initialized as zeros.
+        """
         np.random.seed(2)
         W1 = np.random.randn(self.n_h, n_x)*0.01
         b1 = np.zeros((self.n_h, 1))
         W2 = np.random.rand(n_y, self.n_h)*0.01
         b2 = np.zeros((n_y, 1))
 
+        # Check the shape of the parameters.
         assert(W1.shape == (self.n_h, n_x))
         assert(b1.shape == (self.n_h, 1))
         assert(W2.shape == (n_y, self.n_h))
@@ -47,6 +141,9 @@ class NeuralNetwork():
         return parameters
 
     def _forward_propogation(self, X, parameters):
+        """
+        Perform forward propogation and maintain cache.
+        """
         W1 = parameters["W1"]
         b1 = parameters["b1"]
         W2 = parameters["W2"]
@@ -58,11 +155,16 @@ class NeuralNetwork():
         A2 = self._sigmoid(Z2)
 
         assert(A2.shape == (1, X.shape[1]))
+
+        # Store the values of Z and Activations in a Cache
         cache = {"Z1": Z1, "A1": A1, "Z2": Z2, "A2": A2}
 
         return A2, cache
 
     def _compute_cost(self, A2, Y):
+        """
+        Calculates the overall cost.
+        """
         m = Y.shape[1]
 
         logprobs = np.multiply(Y, np.log(A2)) + np.multiply((1-Y), np.log(1-A2))
@@ -74,6 +176,9 @@ class NeuralNetwork():
         return cost
 
     def _backward_propogation(self, cache, X, Y, parameters):
+        """
+        Performs Back Propogation and calculates the gradients.
+        """
         m = Y.shape[1]
         W1 = parameters["W1"]
         W2 = parameters["W2"]
@@ -93,7 +198,9 @@ class NeuralNetwork():
         return gradients
 
     def _update_parameters(self, gradients, parameters):
-
+        """
+        Optimize the parameters(Weights and bias) using the gradients.
+        """
         W1 = parameters["W1"]
         b1 = parameters["b1"]
         W2 = parameters["W2"]
@@ -113,6 +220,9 @@ class NeuralNetwork():
         return parameters
 
     def _fit(self, X, Y):
+        """
+        Run the Neural Network.
+        """
         np.random.seed(3)
         n_x = self._layer_sizes(X, Y)[0]
         n_y = self._layer_sizes(X,Y)[2]
@@ -136,6 +246,9 @@ class NeuralNetwork():
         self.parameters_ = {"W1":W1, "b1":b1, "W2":W2, "b2":b2}
 
     def _predictions(self, X):
+        """
+        Predict values using the test set.
+        """
         try:
             self.parameters_
         except AttributeError:
@@ -146,10 +259,16 @@ class NeuralNetwork():
         return predictions
 
     def _accuracy(self, predictions, Y):
+        """
+        Calculates the accuracy.
+        """
         accuracy = (100 - np.mean(np.abs(predictions - Y))*100)
         return accuracy
 
     def _evaluate_loss(self):
+        """
+        Stores the costs.
+        """
         try:
             self.parameters_
         except:
