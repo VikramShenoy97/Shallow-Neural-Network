@@ -22,7 +22,7 @@ def drawGraph(number_of_epochs, training_loss, training_accuracy, testing_accura
     fig = go.Figure(data=data, layout=layout)
     fig['layout']['xaxis'].update(title="Number of Epochs", range = [min(x_axis), max(x_axis)], dtick = number_of_epochs/10, showline = True)
     fig['layout']['yaxis'].update(title="Loss", range = [min(y_axis), max(y_axis)], dtick=0.1,showline = True)
-    py.image.save_as(fig, filename="Loss_Graph.png")
+    py.image.save_as(fig, filename="Graphs/Loss_Graph.png")
 
     print "Loss Graph Created"
     x_axis = ["Training", "Testing"]
@@ -38,5 +38,5 @@ def drawGraph(number_of_epochs, training_loss, training_accuracy, testing_accura
     fig = go.Figure(data=data, layout=layout)
     fig['layout']['xaxis'].update(title="Mode", showline = True)
     fig['layout']['yaxis'].update(title="Accuracy")
-    py.image.save_as(fig, filename="Accuracy_Graph.png")
+    py.image.save_as(fig, filename="Graphs/Accuracy_Graph.png")
     print "Accuracy Graph Created"
